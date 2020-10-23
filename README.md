@@ -5,3 +5,4 @@ Excercises from [Vanilla JS Academy 2020](https://vanillajsacademy.com) by Chris
 * Project 3 - Toggle passwords in multiple forms
 * Project 4 - Character count
 * Project 5 - Character and word count
+* Project 6 - Announcing the count
