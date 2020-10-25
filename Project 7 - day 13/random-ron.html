@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Random Ron</title>
+
+	<style type="text/css">
+		body {
+			margin: 1em auto;
+			max-width: 40em;
+			width: 88%;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>Random Ron</h1>
+
+	<blockquote id="quote" aria-live="polites"></blockquote>
+
+	<p>
+		<button id="btn">More Ron</button>
+	</p>
+
+	<script>
+		// Your code goes here...
+
+		const quote = document.querySelector('#quote');
+		const btn = document.querySelector('#btn');
+		const url = 'https://ron-swanson-quotes.herokuapp.com/v2/quotes';
+
+
+		function fetchData() {
+			fetch(url).then(function (response) {
+				if (response.ok) {
+					return response.json();
+				} else {
+					return Promise.reject(response);
+				}
+			}).then(function (data) {
+				quote.textContent = data[0];
+			}).catch(function (error) {
+				console.error(error);
+				quote.textContent = 'Sorry, something went wrong...🤬'
+			})
+		}
+
+		fetchData();
+		btn.addEventListener('click', fetchData);
+
+	</script>
+</body>
+
+</html>
