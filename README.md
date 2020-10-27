@@ -7,3 +7,4 @@ Excercises from [Vanilla JS Academy 2020](https://vanillajsacademy.com) by Chris
 * Project 5 - Character and word count
 * Project 6 - Announcing the count
 * Project 7 - Random Ron
+* Project 8 - Random Ron - no duplicates
