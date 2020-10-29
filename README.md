@@ -8,3 +8,4 @@ Excercises from [Vanilla JS Academy 2020](https://vanillajsacademy.com) by Chris
 * Project 6 - Announcing the count
 * Project 7 - Random Ron
 * Project 8 - Random Ron - no duplicates
+* Project 9 - What to read (top stories from NYT)
