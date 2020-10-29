@@ -16,9 +16,14 @@
 <body>
 
 	<h1>NYT Top Stories - what to read today</h1>
-	<p>Here are today's top stories from <a href="https://www.nytimes.com">The New York Times</a></p>
+	<p>Here are today's <strong>top automobiles' stories</strong> from <a href="https://www.nytimes.com">The New York
+			Times:</a></p>
 
-	<div id="app"></div>
+	<div id="app">
+		<p>
+			<i>Fetching today's top stories...</i>
+		</p>
+	</div>
 
 	<script>
 		// Your code goes here...
@@ -31,10 +36,16 @@
 
 		function showArticles(data) {
 			let articles = data.results;
+			console.log(data.results)
 			app.innerHTML = articles.map(article =>
-				`<ul>
-					<li><a href="${article.url}" target="_blank">${article.title}</a></li>
-				</ul>`)
+				`
+				<ul>
+					<li>
+						<a href="${article.url}" target="_blank">${article.title}</a>
+						<p>${article.abstract}</p>
+					</li>
+				</ul>
+				`)
 				.join('');
 		}
 
