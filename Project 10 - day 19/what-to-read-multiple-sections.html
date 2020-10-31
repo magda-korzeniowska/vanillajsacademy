@@ -10,6 +10,10 @@
 			max-width: 40em;
 			width: 88%;
 		}
+
+		h2 {
+			text-transform: uppercase;
+		}
 	</style>
 </head>
 
@@ -19,16 +23,11 @@
 	<p>Here are today's <strong>top stories</strong> from <a href="https://www.nytimes.com">The New York
 			Times:</a></p>
 
-	<div id="app">
-		<p>
-			<i>Fetching today's top stories...</i>
-		</p>
-	</div>
+	<div id="app"></div>
 
 	<script>
 		// Your code goes here...
 		const app = document.querySelector('#app');
-		// const url = 'https://api.nytimes.com/svc/topstories/v2/movies.json?api-key=YJU2Razd9lwpI3XwMNgZPWZUVUpyIiOk';
 		const categories = ['arts', 'automobiles', 'books', 'business', 'fashion', 'food', 'health', 'home',
 			'insider', 'magazine', 'movies', 'nyregion', 'obituaries', 'opinion', 'politics', 'realestate', 'science',
 			'sports', 'sundayreview', 'technology', 'theater', 't-magazine', 'travel', 'upshot', 'us', 'world'];
@@ -54,42 +53,39 @@
 			selectedIndexes.forEach(index => {
 				currentCategories.push(categories[index]);
 			})
-			console.log(currentCategories)
 		}
 
 		function getJSON(response) {
 			return response.ok ? response.json() : Promise.reject(response);
 		}
 
-		function showArticles(data) {
-			let articles = data.results;
-			console.log(articles)
-			app.innerHTML = articles.map(article =>
-				`
-				<ul>
-					<li>
+		function render(articles, category) {
+			app.innerHTML += `<h2>${category}</h2>` +
+				articles.map(article => (
+					`<article>
 						<h3><a href="${article.url}" target="_blank">${article.title}</a></h3>
+						<p>${article.byline}</p>
 						<p>${article.abstract}</p>
-					</li>
-				</ul>
-				`)
-				.join('');
+					</article>`
+				)).join('');
 		}
 
 		function showError(error) {
-			console.log('Sorry, something went wrong...🤬: ', error)
+			console.log('Sorry, something went wrong...🤬: ', error);
 		}
 
 		function fetchArticles(category) {
 			fetch(createUrl(category))
 				.then(getJSON)
-				.then(showArticles)
-				.catch(showError)
+				.then(function (data) {
+					let articles = data.results.slice(0, noOfArticles);
+					render(articles, category);
+				})
+				.catch(showError);
 		}
 		selectCategories();
 
-		currentCategories.forEach(category => fetchArticles(category))
-
+		currentCategories.forEach(category => fetchArticles(category));
 	</script>
 </body>
 

@@ -9,3 +9,4 @@ Excercises from [Vanilla JS Academy 2020](https://vanillajsacademy.com) by Chris
 * Project 7 - Random Ron
 * Project 8 - Random Ron - no duplicates
 * Project 9 - What to read (top stories from NYT)
+* Project 10 - What to read - multiple sections (top stories from NYT)
