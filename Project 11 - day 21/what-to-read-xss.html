@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>What to read today - sanitizing data</title>
+
+	<style type="text/css">
+		body {
+			margin: 1em auto;
+			max-width: 40em;
+			width: 88%;
+		}
+
+		h2 {
+			text-transform: uppercase;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>NYT Top Stories - what to read today - sanitizing data</h1>
+	<p>Here are today's <strong>top stories</strong> from <a href="https://www.nytimes.com">The New York
+			Times:</a></p>
+
+	<div id="app"></div>
+
+	<script>
+		// Your code goes here...
+		/**
+		* Sanitize and encode all HTML in a user-submitted string
+		* https://portswigger.net/web-security/cross-site-scripting/preventing
+		*/
+
+		const app = document.querySelector('#app');
+		const categories = ['arts', 'automobiles', 'books', 'business', 'fashion', 'food', 'health', 'home',
+			'insider', 'magazine', 'movies', 'nyregion', 'obituaries', 'opinion', 'politics', 'realestate', 'science',
+			'sports', 'sundayreview', 'technology', 'theater', 't-magazine', 'travel', 'upshot', 'us', 'world'];
+		const noOfCategories = 4;
+		const noOfArticles = 3;
+		let currentCategories = [];
+
+		function createUrl(category) {
+			return `https://api.nytimes.com/svc/topstories/v2/${category}.json?api-key=YJU2Razd9lwpI3XwMNgZPWZUVUpyIiOk`
+		}
+
+		function selectCategories() {
+			let min = 0;
+			let max = categories.length;
+			const selectedIndexes = [];
+
+			while (selectedIndexes.length < noOfCategories) {
+				let randomIndex = Math.floor(Math.random() * (max - min)) + min;
+				if (selectedIndexes.indexOf(randomIndex) === -1) {
+					selectedIndexes.push(randomIndex)
+				}
+			}
+			selectedIndexes.forEach(index => {
+				currentCategories.push(categories[index]);
+			})
+		}
+
+		function getJSON(response) {
+			return response.ok ? response.json() : Promise.reject(response);
+		}
+
+		function sanitizeHTML(str) {
+			return str.replace(/[^\w. ]/gi, function (c) {
+				return '&#' + c.charCodeAt(0) + ';';
+			});
+		};
+
+		function render(articles, category) {
+			app.innerHTML += `<h2>${category}</h2>` +
+				articles.map(article => (
+					`<article>
+						<h3><a href="${sanitizeHTML(article.url)}" target="_blank">${sanitizeHTML(article.title)}</a></h3>
+						<p>${sanitizeHTML(article.byline)}</p>
+						<p>${sanitizeHTML(article.abstract)}</p>
+					</article>`
+				)).join('');
+		}
+
+		function showError(error) {
+			console.log('Sorry, something went wrong...🤬: ', error);
+		}
+
+		function fetchArticles(category) {
+			fetch(createUrl(category))
+				.then(getJSON)
+				.then(function (data) {
+					let articles = data.results.slice(0, noOfArticles);
+					render(articles, category);
+				})
+				.catch(showError);
+		}
+		selectCategories();
+
+		currentCategories.forEach(category => fetchArticles(category));
+	</script>
+</body>
+
+</html>
