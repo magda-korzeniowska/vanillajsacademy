@@ -11,3 +11,4 @@ Excercises from [Vanilla JS Academy 2020](https://vanillajsacademy.com) by Chris
 * Project 9 - What to read (top stories from NYT)
 * Project 10 - What to read - multiple sections (top stories from NYT)
 * Project 11 - What to read - sanitizing data
+* Project 12 - Monsters

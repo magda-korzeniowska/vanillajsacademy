@@ -37,7 +37,7 @@
 
 <body>
 
-	<h1>Monsters!</h1>
+	<h1>Monster Shuffle</h1>
 
 	<div id="app"></div>
 
@@ -57,7 +57,7 @@
 
 	<script>
 		// The monsters and socks
-		var monsters = [
+		const monsters = [
 			'monster1',
 			'monster2',
 			'monster3',
@@ -79,9 +79,7 @@
 		* https://stackoverflow.com/a/2450976/1293256
 		*/
 
-		const app = document.querySelector('#app');
-
-		function shuffle(array) {
+		const shuffle = function (array) {
 
 			let currentIndex = array.length;
 			let temporaryValue, randomIndex;
@@ -102,7 +100,20 @@
 
 		};
 
+		const app = document.querySelector('#app');
 
+		function createMonsters(monsters) {
+			app.innerHTML = '<div class="row">' + monsters.map(monster => (
+				`<div class="grid"><img alt=${monster} src='${monster}.svg'></div>`
+			)).join('') + '</div>';
+		}
+
+		showMonsters(monsters);
+
+		function showMonsters(monsters) {
+			shuffle(monsters);
+			createMonsters(monsters);
+		}
 
 	</script>
 </body>
