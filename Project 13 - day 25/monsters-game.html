@@ -136,6 +136,8 @@
 			// get the value of data-monster-id (index in the array)
 			let id = monster.getAttribute('data-monster-id');
 
+			// Update the HTML for the button's parent element
+			// This will replace the button so that the content can't be clicked again
 			monster.parentNode.innerHTML = `<img src='${monsters[id]}.svg' alt='${monsters[id]}'>`
 		})
 
