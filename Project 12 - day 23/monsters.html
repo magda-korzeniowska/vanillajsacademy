@@ -103,9 +103,14 @@
 		const app = document.querySelector('#app');
 
 		function createMonsters(monsters) {
-			app.innerHTML = '<div class="row">' + monsters.map(monster => (
-				`<div class="grid"><img alt=${monster} src='${monster}.svg'></div>`
-			)).join('') + '</div>';
+			app.innerHTML = `
+				<div class="row">
+					${monsters.map(monster => `
+						<div class="grid">
+							<img alt=${monster} src='${monster}.svg'>
+						</div>
+					`).join('')}
+				</div>`;
 		}
 
 		showMonsters(monsters);
