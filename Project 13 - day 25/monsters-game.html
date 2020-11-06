@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Monsters! - Reveal</title>
+
+	<style type="text/css">
+		body {
+			margin: 1em auto;
+			max-width: 40em;
+			width: 88%;
+		}
+
+		/**
+		 * A simple grid layout
+		 */
+		.row {
+			display: grid;
+			grid-template-columns: auto auto auto;
+			text-align: center;
+		}
+
+		.grid {
+			min-height: 6em;
+			padding: 1em;
+		}
+
+		/**
+		 * Make sure images scale
+		 */
+		img {
+			height: auto;
+			max-width: 100%;
+		}
+
+		[data-monster-id] {
+			background-color: transparent;
+			border: 0;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>Monsters Reveal</h1>
+
+	<div id="app"></div>
+
+	<footer>
+		<hr>
+		<p class="text-small text-muted">Icons by <a href="https://thenounproject.com/term/door/311732/">Jamie
+				Dickinson</a>, <a href="https://thenounproject.com/term/monster/184225/">Nicky Knicky</a>, <a
+				href="https://thenounproject.com/term/monster/1510400/">Alvaro Cabrera</a>, <a
+				href="https://thenounproject.com/term/monster/28460/">Eliricon</a>, <a
+				href="https://thenounproject.com/term/monster/82823/">April Yang</a>, <a
+				href="https://thenounproject.com/term/monster/1062009/">tk66</a>, <a
+				href="https://thenounproject.com/term/monster/24990/">Alex WaZa</a>, <a
+				href="https://thenounproject.com/term/monster/37212/">Husein Aziz</a>, <a
+				href="https://thenounproject.com/term/monster/2236082">iconcheese</a>, and <a
+				href="https://thenounproject.com/term/socks/38451/">Yazmin Alanis</a>.</p>
+	</footer>
+
+	<script>
+		// The monsters and socks
+		const monsters = [
+			'monster1',
+			'monster2',
+			'monster3',
+			'monster4',
+			'monster5',
+			'monster6',
+			'monster7',
+			'monster8',
+			'monster9',
+			'monster10',
+			'monster11',
+			'sock'
+		];
+
+		// Your code goes here...
+
+		/**
+		* Randomly shuffle an array
+		* https://stackoverflow.com/a/2450976/1293256
+		*/
+
+		const shuffle = function (array) {
+
+			let currentIndex = array.length;
+			let temporaryValue, randomIndex;
+
+			// While there remain elements to shuffle...
+			while (0 !== currentIndex) {
+				// Pick a remaining element...
+				randomIndex = Math.floor(Math.random() * currentIndex);
+				currentIndex -= 1;
+
+				// And swap it with the current element.
+				temporaryValue = array[currentIndex];
+				array[currentIndex] = array[randomIndex];
+				array[randomIndex] = temporaryValue;
+			}
+
+			return array;
+
+		};
+
+		const app = document.querySelector('#app');
+
+		function createDoorGrid(monsters) {
+			app.innerHTML = `
+				<p>Open a door to find a monster. Try not to find any socks!</p>
+				<div class="row">
+					${monsters.map((monster, index) => `
+						<div class="grid" aria-live="polite">
+							<button role="button" data-monster-id=${index}>
+								<img src="door.svg" alt="Open the door">
+							</button>
+						</div>
+					`).join('')}
+				</div>`;
+		}
+
+		function startGame(monsters) {
+			shuffle(monsters);
+			createDoorGrid(monsters);
+		}
+
+		document.addEventListener('click', function (event) {
+			// element.closest usage - sometimes the img fires the event, but the button is the item we want. 
+			// By using closest if the img is clicked we will climb up the DOM untill we find [data-monster-id]. 
+			// So both - when button is clicked or sth inside it, it will be good. 
+			const monster = event.target.closest('[data-monster-id]');
+			if (!monster) return
+
+			// get the value of data-monster-id (index in the array)
+			let id = monster.getAttribute('data-monster-id');
+
+			monster.parentNode.innerHTML = `<img src='${monsters[id]}.svg' alt='${monsters[id]}'>`
+		})
+
+		startGame(monsters);
+
+	</script>
+</body>
+
+</html>
