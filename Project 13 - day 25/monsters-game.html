@@ -79,6 +79,8 @@
 
 		// Your code goes here...
 
+		const app = document.querySelector('#app');
+
 		/**
 		* Randomly shuffle an array
 		* https://stackoverflow.com/a/2450976/1293256
@@ -105,15 +107,13 @@
 
 		};
 
-		const app = document.querySelector('#app');
-
 		function createDoorGrid(monsters) {
 			app.innerHTML = `
 				<p>Open a door to find a monster. Try not to find any socks!</p>
 				<div class="row">
 					${monsters.map((monster, index) => `
 						<div class="grid" aria-live="polite">
-							<button role="button" data-monster-id=${index}>
+							<button data-monster-id=${index}>
 								<img src="door.svg" alt="Open the door">
 							</button>
 						</div>

@@ -13,3 +13,4 @@ Excercises from [Vanilla JS Academy 2020](https://vanillajsacademy.com) by Chris
 * Project 11 - What to read - sanitizing data
 * Project 12 - Monster Shuffle
 * Project 13 - Monster Reveal
+* Project 14 - Find the Monsters - Track Wins

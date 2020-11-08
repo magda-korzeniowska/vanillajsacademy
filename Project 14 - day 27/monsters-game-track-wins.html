@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>Monsters!</title>
+	<title>Monsters! - Reveal</title>
 
 	<style type="text/css">
 		body {
@@ -32,12 +32,17 @@
 			height: auto;
 			max-width: 100%;
 		}
+
+		[data-monster-id] {
+			background-color: transparent;
+			border: 0;
+		}
 	</style>
 </head>
 
 <body>
 
-	<h1>Monster Shuffle</h1>
+	<h1>Monsters Reveal</h1>
 
 	<div id="app"></div>
 
@@ -75,6 +80,7 @@
 		// Your code goes here...
 
 		const app = document.querySelector('#app');
+		let monstersFound;
 
 		/**
 		* Randomly shuffle an array
@@ -102,23 +108,71 @@
 
 		};
 
-		function createMonsters(monsters) {
+		function renderGame() {
+			monstersFound = 0;
+			shuffle(monsters);
+
 			app.innerHTML = `
+				<p>Open a door to find a monster. Try not to find any socks!</p>
 				<div class="row">
-					${monsters.map(monster => `
-						<div class="grid">
-							<img alt=${monster} src='${monster}.svg'>
+					${monsters.map((monster, index) => `
+						<div class="grid" aria-live="polite">
+							<button data-monster-id=${index}>
+								<img src="door.svg" alt="Open the door">
+							</button>
 						</div>
 					`).join('')}
 				</div>`;
 		}
 
-		showMonsters(monsters);
-
-		function showMonsters(monsters) {
-			shuffle(monsters);
-			createMonsters(monsters);
+		function gameWon() {
+			app.innerHTML = `
+			<h3>Congrats! You found all of the monsters!!!!</h3>
+			<button data-monster-play-again>PLAY AGAIN</button>			
+			`
 		}
+
+		function gameLost() {
+			app.innerHTML = `
+			<h3>Oh no! You found socks and lost😢</h3>
+			<button data-monster-play-again>PLAY AGAIN</button>
+			`
+		}
+
+		function clickHandler(event) {
+			if (event.target.hasAttribute('data-monster-play-again')) {
+				renderGame();
+				return;
+			}
+
+			// element.closest usage - sometimes the img fires the event, but the button is the item we want. 
+			// By using closest if the img is clicked we will climb up the DOM untill we find [data-monster-id]. 
+			// So both - when button is clicked or sth inside it, it will be good. 
+			const monster = event.target.closest('[data-monster-id]');
+
+			if (!monster) return
+
+			// get the value of data-monster-id (index in the array)
+			let id = monster.getAttribute('data-monster-id');
+
+			// Update the HTML for the button's parent element
+			// This will replace the button so that the content can't be clicked again
+			monster.parentNode.innerHTML = `<img src='${monsters[id]}.svg' alt='${monsters[id]}'>`
+
+			if (monsters[id] !== 'sock') {
+				monstersFound++;
+				if (monstersFound === (monsters.length - 1)) {
+					gameWon();
+				}
+			} else {
+				gameLost();
+				return;
+			}
+		}
+
+		renderGame();
+
+		document.addEventListener('click', clickHandler);
 
 	</script>
 </body>
