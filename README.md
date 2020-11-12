@@ -15,3 +15,4 @@ Excercises from [Vanilla JS Academy 2020](https://vanillajsacademy.com) by Chris
 * Project 13 - Monster Reveal
 * Project 14 - Find the Monsters - Track Wins
 * Project 15 - Table of Contents
+* Project 16 - Table of Contents - missing IDs
