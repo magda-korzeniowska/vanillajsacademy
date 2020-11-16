@@ -17,3 +17,4 @@ Excercises from [Vanilla JS Academy 2020](https://vanillajsacademy.com) by Chris
 * Project 15 - Table of Contents
 * Project 16 - Table of Contents - missing IDs
 * Project 17 - Table of Contents - scope
+* Project 18 - Weather App

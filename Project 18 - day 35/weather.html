@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Weather App</title>
+
+	<style type="text/css">
+		body {
+			margin: 1em auto;
+			max-width: 30em;
+			width: 88%;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>Weather App</h1>
+
+	<div id="app">Checking the weather near you...</div>
+
+	<script>
+		// Your code goes here...
+
+		/**
+		* Sanitize and encode all HTML in a user-submitted string
+		* https://portswigger.net/web-security/cross-site-scripting/preventing
+		*/
+
+		const app = document.querySelector('#app');
+		const locationAPIUrl = 'https://ipapi.co/json';
+		const weatherAPIUrl = 'https://api.weatherbit.io/v2.0/current';
+		const weatherAPIKey = 'a67e6c10e74e4d66a60019c40de4ec4f';
+
+		function sanitizeHTML(str) {
+			return String(str).replace(/[^\w. ]/gi, function (c) {
+				return '&#' + c.charCodeAt(0) + ';';
+			});
+		}
+
+		function renderWeather(weatherData) {
+			app.innerHTML = `
+				<div>
+					<p>Current weather in ${sanitizeHTML(weatherData.city_name)}</p>
+					<img src="https://www.weatherbit.io/static/img/icons/${sanitizeHTML(weatherData.weather.icon)}.png" alt="${sanitizeHTML(weatherData.weather.description)}"></img>			
+					<p>Temperature: <strong>${sanitizeHTML(weatherData.app_temp)}°C</strong></p>
+					<p>Conditions: ${sanitizeHTML(weatherData.weather.description)}</p>
+				</div>
+			`
+		}
+
+		function getWeather() {
+			fetch(locationAPIUrl).then(function (response) {
+				if (response.ok) {
+					return response.json();
+				} else {
+					return Promise.reject(response);
+				}
+			}).then(function (locationData) {
+				let lat = locationData.latitude;
+				let lon = locationData.longitude;
+				return fetch(`${weatherAPIUrl}?&lat=${lat}&lon=${lon}&key=${weatherAPIKey}`)
+			}).then(function (response) {
+				if (response.ok) {
+					return response.json();
+				} else {
+					return Promise.reject(response);
+				}
+			}).then(function (weatherData) {
+				console.log(weatherData.data[0])
+				renderWeather(weatherData.data[0]);
+			}).catch(function (error) {
+				console.error(error);
+				app.textContent = 'Sorry, something went wrong...🤬'
+			})
+		}
+
+		getWeather();
+
+	</script>
+</body>
+
+</html>
