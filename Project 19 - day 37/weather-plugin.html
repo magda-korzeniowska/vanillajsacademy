@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Weather App</title>
+
+	<style type="text/css">
+		body {
+			margin: 1em auto;
+			max-width: 30em;
+			width: 88%;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>Weather App</h1>
+
+	<div id="app">Checking the weather near you...</div>
+
+	<script>
+		// Your code goes here...
+
+		/**
+		* Sanitize and encode all HTML in a user-submitted string
+		* https://portswigger.net/web-security/cross-site-scripting/preventing
+		*/
+
+		function getWeatherInfo(options) {
+
+			const locationAPIUrl = 'https://ipapi.co/json';
+			const weatherAPIUrl = 'https://api.weatherbit.io/v2.0/current';
+
+			const defaults = {
+				weatherAPIKey: null,
+				selector: '#app',
+				convertTemp: false,
+				showIcon: true,
+				message: 'Current weather in {{ location }}',
+				noWeather: 'Sorry! Unable to get weather data at this time...😢'
+			};
+
+			let settings = Object.assign(defaults, options);
+
+			let app = document.querySelector(settings.selector);
+
+			function sanitizeHTML(str) {
+				return String(str).replace(/[^\w. ]/gi, function (c) {
+					return '&#' + c.charCodeAt(0) + ';';
+				});
+			}
+
+			function cToF(temp) {
+				if (settings.convertTemp) {
+					return ((parseFloat(temp) * 9 / 5) + 32).toFixed(1);
+				}
+				return temp;
+			};
+
+			function getSymbolForTempUnit() {
+				return settings.convertTemp ? '&#8457' : '&#8451';
+			}
+
+			// Get the description for the current weather conditions
+			function getMessage(weather) {
+				return settings.message
+					.replace('{{location}}', sanitizeHTML(weather.city_name))
+					.replace('{{temp}}', `${sanitizeHTML(cToF(weather.app_temp))} ${getSymbolForTempUnit()}`)
+					.replace('{{desc}}', sanitizeHTML(weather.weather.description))
+			}
+
+			// Don't run if no API key was provided
+			if (!settings.weatherAPIKey) {
+				console.warn('Please, provide an API key');
+				return;
+			}
+
+			// Render the weather data into the DOM
+			function renderWeather(weatherData) {
+
+				app.innerHTML = `
+				<div>
+					<p>${getMessage(weatherData)}</p>
+
+					${settings.showIcon
+						? `<img src="https://www.weatherbit.io/static/img/icons/${sanitizeHTML(weatherData.weather.icon)}.png" alt="${sanitizeHTML(weatherData.weather.description)}"></img>`
+						: ''
+					}
+				
+					<p>Temperature: <strong>${sanitizeHTML(cToF(weatherData.app_temp))} ${getSymbolForTempUnit()}</strong></p>
+									
+					<p>Conditions: ${sanitizeHTML(weatherData.weather.description)}</p>
+				</div>
+				`
+			}
+
+			// Display a message when no weather data can be found
+			function renderNoWeather() {
+				app.textContent = settings.noWeather;
+			}
+
+			function getWeather() {
+				fetch(locationAPIUrl).then(function (response) {
+					if (response.ok) {
+						return response.json();
+					} else {
+						return Promise.reject(response);
+					}
+				}).then(function (locationData) {
+					let lat = locationData.latitude;
+					let lon = locationData.longitude;
+					return fetch(`${weatherAPIUrl}?&lat=${lat}&lon=${lon}&key=${settings.weatherAPIKey}`)
+				}).then(function (response) {
+					if (response.ok) {
+						return response.json();
+					} else {
+						return Promise.reject(response);
+					}
+				}).then(function (weatherData) {
+					console.log(weatherData.data[0])
+					renderWeather(weatherData.data[0]);
+				}).catch(function (error) {
+					console.error(error);
+					renderNoWeather();
+				})
+			}
+
+			getWeather();
+
+		};
+
+		// Initialize the plugin (with optional settings)
+		getWeatherInfo({
+			weatherAPIKey: 'a67e6c10e74e4d66a60019c40de4ec4f',
+			// selector: '#whatever',
+			// convertTemp: true,
+			// showIcon: false,
+			// message: `It\'s {{ temp }} in {{ location }}`
+			// noWeather: "Oh no! No weather available!"
+		})
+
+	</script>
+</body>
+
+</html>

@@ -1,4 +1,4 @@
-Excercises from [Vanilla JS Academy 2020](https://vanillajsacademy.com) by Chris Ferdinandi:
+Exercises from [Vanilla JS Academy 2020](https://vanillajsacademy.com) by Chris Ferdinandi:
 
 * Project 1 - Toggle password visibility
 * Project 2 - Toggle multiple password fields
@@ -18,3 +18,4 @@ Excercises from [Vanilla JS Academy 2020](https://vanillajsacademy.com) by Chris
 * Project 16 - Table of Contents - missing IDs
 * Project 17 - Table of Contents - scope
 * Project 18 - Weather App
+* Project 19 - Weather App - plugin
