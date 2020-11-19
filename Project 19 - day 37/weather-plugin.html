@@ -65,9 +65,9 @@
 			// Get the description for the current weather conditions
 			function getMessage(weather) {
 				return settings.message
-					.replace('{{location}}', sanitizeHTML(weather.city_name))
-					.replace('{{temp}}', `${sanitizeHTML(cToF(weather.app_temp))} ${getSymbolForTempUnit()}`)
-					.replace('{{desc}}', sanitizeHTML(weather.weather.description))
+					.replace('{{ location }}', sanitizeHTML(weather.city_name))
+					.replace('{{ temp }}', `${sanitizeHTML(cToF(weather.app_temp))} ${getSymbolForTempUnit()}`)
+					.replace('{{ desc }}', sanitizeHTML(weather.weather.description))
 			}
 
 			// Don't run if no API key was provided

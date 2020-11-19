@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Helper Library</title>
+
+	<style type="text/css">
+		body {
+			margin: 1em auto;
+			max-width: 40em;
+			width: 88%;
+		}
+
+		.btn-blue {
+			background-color: #0088cc;
+			color: #ffffff;
+		}
+
+		.btn-purple {
+			background-color: rebeccapurple;
+			color: #ffffff;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>Helper Library</h1>
+
+	<p>All of the fun here happens in the console.</p>
+
+	<p>
+		<button class="btn-blue" id="button-1">Button 1</button>
+		<button class="btn-blue" id="button-2">Button 2</button>
+		<button class="btn-blue" id="button-3">Button 3</button>
+	</p>
+
+	<script>
+		// Your code goes here...
+		const helperLibrary = (function () {
+
+			const methods = {};
+
+			// Convert a NodeList to an array
+			methods.convert = function (nodeList) {
+				return Array.prototype.slice.call(nodeList);
+			};
+
+			// Get the first matching element in the DOM
+			methods.getFirstElement = function (selector) {
+				return document.querySelector(selector);
+			};
+
+			// Get all matching elements in the DOM as an array.
+			methods.getAllElements = function (selector) {
+				return methods.convert(document.querySelectorAll(selector));
+			};
+
+			// Add a class to all elements in an array.
+			methods.addClass = function (array, className) {
+				array.forEach(function (item) {
+					item.classList.add(className);
+				});
+			};
+
+			// Remove a class from all elements in an array.
+			methods.removeClass = function (array, className) {
+				array.forEach(function (item) {
+					item.classList.remove(className);
+				});
+			};
+
+			return methods;
+
+		})();
+
+		// testing:
+		// let nodeList = document.querySelectorAll('.btn-blue');
+		// console.log(helperLibrary.convert(nodeList));
+
+		// console.log(helperLibrary.getFirstElement('.btn-blue'));
+
+		// console.log(helperLibrary.getAllElements('.btn-blue'));
+
+		// let array = helperLibrary.getAllElements('.btn-blue')
+		// helperLibrary.addClass(array, 'btn-purple')
+
+		// helperLibrary.removeClass(array, 'btn-purple')
+
+	</script>
+</body>
+
+</html>
