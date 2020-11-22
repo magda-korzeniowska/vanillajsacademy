@@ -52,8 +52,8 @@
       };
 
       // Gets an array of items from the DOM 
-      Constructor.prototype.getArray = function () {
-        return Array.prototype.slice.call(this.elements).map(element => element.textContent)
+      Constructor.prototype.getItems = function () {
+        return Array.prototype.slice.call(this.elements)
       };
 
       // Gets the first and last matching items from the DOM
@@ -66,10 +66,13 @@
       };
 
       // Adds and removes a class to all matching elements
-      // Constructor.prototype.addClass = function (className) {
-      //   const elements = this.getArray()
-      //   elements.forEach(el => el.classList.add(className));
-      // };
+      Constructor.prototype.addClass = function (className) {
+        this.getItems().forEach(el => el.classList.add(className));
+      };
+
+      Constructor.prototype.removeClass = function (className) {
+        this.getItems().forEach(el => el.classList.remove(className));
+      }
 
       return Constructor;
 
@@ -77,27 +80,24 @@
 
     // Testing
 
+    // new instances:
     const items = new Elements('li');
-    console.log(items);
-
-    const itemsArray = items.getArray();
-    console.log(itemsArray);
-
-    const firstElement = items.getFirst();
-    console.log(firstElement);
-
-    const lastElement = items.getLast();
-    console.log(lastElement);
-
-    // *****************
-
     const buttons = new Elements('button');
-    console.log(buttons);
 
-    const buttonsArray = buttons.getArray();
-    console.log(buttonsArray)
+    // Elements.getItems()
+    console.log('Elements.getItems()', items.getItems(), buttons.getItems());
 
-    // buttons.addClass('btn-purple')
+    // Elements.getFirst()
+    console.log('Elements.getFirst()', items.getFirst(), buttons.getFirst());
+
+    // Elements.getLast()
+    console.log('Elements.getLast()', items.getLast(), buttons.getLast());
+
+    // Elements.addClass()
+    buttons.addClass('btn-purple');
+
+    // Elements.removeClass()
+    buttons.removeClass('btn-purple');
 
   </script>
 </body>
