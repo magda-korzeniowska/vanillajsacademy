@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>DOM Manipulation Library</title>
+
+  <style type="text/css">
+    body {
+      margin: 1em auto;
+      max-width: 40em;
+      width: 88%;
+    }
+
+
+    .btn-blue {
+      background-color: #0088cc;
+      color: #ffffff;
+    }
+
+    .btn-purple {
+      background-color: rebeccapurple;
+      color: #ffffff;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>DOM Manipulation Library</h1>
+
+  <p>All of the fun here happens in the console.</p>
+
+  <p>
+    <button class="btn-blue" id="button-1">Button 1</button>
+    <button class="btn-blue" id="button-2">Button 2</button>
+    <button class="btn-blue" id="button-3">Button 3</button>
+  </p>
+
+  <ul>
+    <li>Item 1</li>
+    <li>Item 2</li>
+    <li>Item 3</li>
+  </ul>
+
+  <script>
+    // Your code goes here...
+
+    const Elements = (function () {
+
+      const Constructor = function (selector) {
+        this.elements = document.querySelectorAll(selector);
+      };
+
+      // Gets an array of items from the DOM 
+      Constructor.prototype.getItems = function () {
+        return Array.prototype.slice.call(this.elements)
+      };
+
+      // Gets the first and last matching items from the DOM
+      Constructor.prototype.getFirst = function () {
+        return this.elements[0];
+      };
+
+      Constructor.prototype.getLast = function () {
+        return this.elements[this.elements.length - 1];
+      };
+
+      // Adds and removes a class to all matching elements
+      Constructor.prototype.addClass = function (className) {
+        this.getItems().forEach(el => el.classList.add(className));
+        return this;
+      };
+
+      Constructor.prototype.removeClass = function (className) {
+        this.getItems().forEach(el => el.classList.remove(className));
+        return this;
+      }
+
+      return Constructor;
+
+    })();
+
+    // Testing
+
+    // new instances:
+    const items = new Elements('li');
+    const buttons = new Elements('button');
+
+    // Elements.getItems()
+    console.log('Elements.getItems()', items.getItems(), buttons.getItems());
+
+    // Elements.getFirst()
+    console.log('Elements.getFirst()', items.getFirst(), buttons.getFirst());
+
+    // Elements.getLast()
+    console.log('Elements.getLast()', items.getLast(), buttons.getLast());
+
+    // Elements.addClass() + .removeClass('btn-purple');
+    buttons.addClass('btn-purple').removeClass('btn-blue');
+
+  </script>
+</body>
+
+</html>

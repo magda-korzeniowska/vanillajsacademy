@@ -21,3 +21,4 @@ Exercises from [Vanilla JS Academy 2020](https://vanillajsacademy.com) by Chris 
 * Project 19 - Weather App - plugin
 * Project 20 - Helper Library - Revealing Module Pattern
 * Project 21 - DOM Manipulation Library - Constructor Pattern
+* Project 22 - DOM Manipulation Library - Constructor Pattern - Chaining Methods
