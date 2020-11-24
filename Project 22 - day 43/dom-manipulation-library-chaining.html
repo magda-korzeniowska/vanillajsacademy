@@ -83,20 +83,13 @@
     // Testing
 
     // new instances:
-    const items = new Elements('li');
     const buttons = new Elements('button');
-
-    // Elements.getItems()
-    console.log('Elements.getItems()', items.getItems(), buttons.getItems());
-
-    // Elements.getFirst()
-    console.log('Elements.getFirst()', items.getFirst(), buttons.getFirst());
-
-    // Elements.getLast()
-    console.log('Elements.getLast()', items.getLast(), buttons.getLast());
 
     // Elements.addClass() + .removeClass('btn-purple');
     buttons.addClass('btn-purple').removeClass('btn-blue');
+
+    // or one liner
+    new Elements('button').removeClass('btn-blue').addClass('btn-purple');
 
   </script>
 </body>
