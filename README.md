@@ -25,3 +25,4 @@ Exercises from [Vanilla JS Academy 2020](https://vanillajsacademy.com) by Chris 
 * Project 23 - Monster Debug - Debugging Broken Code
 * Project 24 - Autosave - Form Autosave
 * Project 25 - Autosave - Single Entry
+* Project 26 - Autosave - Other Field Types
