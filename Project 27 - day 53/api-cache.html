@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>API Cache</title>
+
+	<style type="text/css">
+		body {
+			margin: 1em auto;
+			max-width: 40em;
+			width: 88%;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>API Cache</h1>
+	<p><em><strong>The Scuttlebutt</strong>&mdash;the number one source for pirate news!</em></p>
+
+	<div id="app">
+		Loading...
+	</div>
+
+	<script>
+		// Your code goes here...
+
+		const app = document.querySelector('#app');
+		const url = 'https://vanillajsacademy.com/api/pirates.json';
+
+		function getJSON(response) {
+			return response.ok ? response.json() : Promise.reject(response);
+		}
+
+		function showArticles(data) {
+			let articles = data.articles;
+
+			app.innerHTML = articles.map(article =>
+				`
+				<ul>
+					<li>
+						<h2>${article.title}</h2>
+						<p>${article.article}</p>
+					</li>
+				</ul>
+				`
+			).join('');
+
+			return articles;
+		}
+
+		function saveData(articles) {
+			console.log('saving articles', articles)
+			let data = {
+				data: articles,
+				timestamp: new Date().getTime()
+			}
+
+			localStorage.setItem('articles', JSON.stringify(data));
+		}
+
+		function isDataValid(saved, goodFor) {
+			if (!saved || !saved.data || !saved.timestamp) return false;
+
+			let difference = new Date().getTime() - saved.timestamp;
+			return difference < goodFor;
+		}
+
+		function getData() {
+			let saved = JSON.parse(localStorage.getItem('articles'));
+
+			if (isDataValid(saved, 10000)) {
+				console.log('get data')
+				let articles = saved.data;
+				console.log('getting data', articles)
+				app.innerHTML = articles.map(article =>
+					`
+				<ul>
+					<li>
+						<h2>${article.title}</h2>
+						<p>${article.article}</p>
+					</li>
+				</ul>
+				`
+				).join('');
+			} else {
+				console.log('save new data')
+				fetchArticles();
+			}
+		}
+
+		function fetchArticles() {
+			fetch(url)
+				.then(getJSON)
+				.then(showArticles)
+				.then(saveData)
+		}
+
+		getData();
+	</script>
+</body>
+
+</html>
