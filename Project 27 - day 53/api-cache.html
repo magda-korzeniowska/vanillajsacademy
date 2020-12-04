@@ -25,10 +25,20 @@
 	<script>
 		// Your code goes here...
 
+		/**
+		* Sanitize and encode all HTML in a user-submitted string
+		* https://portswigger.net/web-security/cross-site-scripting/preventing
+		*/
+
 		const app = document.querySelector('#app');
 		const url = 'https://vanillajsacademy.com/api/pirates.json';
 		const storageID = 'piratesCache';
 
+		function sanitizeHTML(str) {
+			return str.replace(/[^\w. ]/gi, function (c) {
+				return '&#' + c.charCodeAt(0) + ';';
+			});
+		};
 
 		function getJSON(response) {
 			return response.ok ? response.json() : Promise.reject(response);
@@ -37,28 +47,35 @@
 		function showArticles(data) {
 			let articles = data.articles;
 
+			if (articles.length < 1) {
+				renderNoArticles();
+				return;
+			}
+
 			app.innerHTML = articles.map(article =>
 				`
-				<ul>
-					<li>
-						<h2>${article.title}</h2>
-						<p>${article.article}</p>
-					</li>
-				</ul>
+				<article>
+					<h2>${sanitizeHTML(article.title)}</h2>
+					<p><em>${sanitizeHTML(article.author)} on ${sanitizeHTML(article.pubdate)}</em></p>
+					<p>${sanitizeHTML(article.article)}</p>
+				</article>
 				`
 			).join('');
+		}
 
-			return articles;
+		function renderNoArticles(error) {
+			app.innerHTML = '<p>There is no pirate news! Come back later!</p>'
+			console.log(error)
 		}
 
 		function saveData(articles) {
-			console.log('fetched from API', articles)
-			let data = {
+			console.log('fetched from API')
+			let cache = {
 				data: articles,
 				timestamp: new Date().getTime()
 			}
 
-			localStorage.setItem(storageID, JSON.stringify(data));
+			localStorage.setItem(storageID, JSON.stringify(cache));
 		}
 
 		function isDataValid(saved, goodFor) {
@@ -69,39 +86,35 @@
 		}
 
 		function getData() {
-			let saved = JSON.parse(localStorage.getItem(storageID));
 
-			if (isDataValid(saved, 10000)) {
-				let articles = saved.data;
-				console.log('loaded from cache', articles)
-				app.innerHTML = articles.map(article =>
-					`
-				<ul>
-					<li>
-						<h2>${article.title}</h2>
-						<p>${article.article}</p>
-					</li>
-				</ul>
-				`
-				).join('');
-			} else {
-				fetchArticles();
+			let saved = localStorage.getItem(storageID);
+			if (!saved) return;
+			saved = JSON.parse(saved);
+
+			if (isDataValid(saved, 1000 * 10)) {
+				return saved.data;
 			}
 		}
 
-		function showError(error) {
-			console.log('Sorry, something went wrong...🤬: ', error)
-		}
-
 		function fetchArticles() {
+			let saved = getData();
+			if (saved) {
+				showArticles(saved);
+				console.log('Loaded from cache');
+				return;
+			}
+
 			fetch(url)
 				.then(getJSON)
-				.then(showArticles)
-				.then(saveData)
-				.catch(showError)
+				.then(function (data) {
+					showArticles(data);
+					saveData(data);
+				})
+				.catch(renderNoArticles);
 		}
 
-		getData();
+		fetchArticles();
+
 	</script>
 </body>
 
