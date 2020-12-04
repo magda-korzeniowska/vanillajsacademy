@@ -27,6 +27,8 @@
 
 		const app = document.querySelector('#app');
 		const url = 'https://vanillajsacademy.com/api/pirates.json';
+		const storageID = 'piratesCache';
+
 
 		function getJSON(response) {
 			return response.ok ? response.json() : Promise.reject(response);
@@ -50,13 +52,13 @@
 		}
 
 		function saveData(articles) {
-			console.log('saving articles', articles)
+			console.log('fetched from API', articles)
 			let data = {
 				data: articles,
 				timestamp: new Date().getTime()
 			}
 
-			localStorage.setItem('articles', JSON.stringify(data));
+			localStorage.setItem(storageID, JSON.stringify(data));
 		}
 
 		function isDataValid(saved, goodFor) {
@@ -67,12 +69,11 @@
 		}
 
 		function getData() {
-			let saved = JSON.parse(localStorage.getItem('articles'));
+			let saved = JSON.parse(localStorage.getItem(storageID));
 
 			if (isDataValid(saved, 10000)) {
-				console.log('get data')
 				let articles = saved.data;
-				console.log('getting data', articles)
+				console.log('loaded from cache', articles)
 				app.innerHTML = articles.map(article =>
 					`
 				<ul>
@@ -84,9 +85,12 @@
 				`
 				).join('');
 			} else {
-				console.log('save new data')
 				fetchArticles();
 			}
+		}
+
+		function showError(error) {
+			console.log('Sorry, something went wrong...🤬: ', error)
 		}
 
 		function fetchArticles() {
@@ -94,6 +98,7 @@
 				.then(getJSON)
 				.then(showArticles)
 				.then(saveData)
+				.catch(showError)
 		}
 
 		getData();
