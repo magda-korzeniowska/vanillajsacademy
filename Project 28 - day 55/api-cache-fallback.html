@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>API Cache</title>
+
+	<style type="text/css">
+		body {
+			margin: 1em auto;
+			max-width: 40em;
+			width: 88%;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>API Cache</h1>
+	<p><em><strong>The Scuttlebutt</strong>&mdash;the number one source for pirate news!</em></p>
+
+	<div id="app">
+		Loading...
+	</div>
+
+	<script>
+		// Your code goes here...
+
+		/**
+		* Sanitize and encode all HTML in a user-submitted string
+		* https://portswigger.net/web-security/cross-site-scripting/preventing
+		*/
+
+		const app = document.querySelector('#app');
+		const storageID = 'piratesCache';
+
+		function sanitizeHTML(str) {
+			return str.replace(/[^\w. ]/gi, function (c) {
+				return '&#' + c.charCodeAt(0) + ';';
+			});
+		};
+
+		//Dynamically vary the API endpoint
+		function getEndpoint() {
+			const endpoint = 'https://vanillajsacademy.com/api/';
+			let random = Math.random();
+			if (random < 0.5) return endpoint + 'pirates.json';
+			return endpoint + 'fail.json';
+		};
+
+		function getJSON(response) {
+			return response.ok ? response.json() : Promise.reject(response);
+		}
+
+		function showArticles(data) {
+			let articles = data.articles;
+
+			if (articles.length < 1) {
+				renderCachedArticles();
+				return;
+			}
+
+			app.innerHTML = articles.map(article =>
+				`
+				<article>
+					<h2>${sanitizeHTML(article.title)}</h2>
+					<p><em>${sanitizeHTML(article.author)} on ${sanitizeHTML(article.pubdate)}</em></p>
+					<p>${sanitizeHTML(article.article)}</p>
+				</article>
+				`
+			).join('');
+		}
+
+		function renderCachedArticles(error) {
+			const status = true;
+			getData(status);
+			console.log('Loaded from cache', error);
+		}
+
+		function saveData(articles) {
+			console.log('fetched from API')
+			let cache = {
+				data: articles,
+				timestamp: new Date().getTime()
+			}
+
+			localStorage.setItem(storageID, JSON.stringify(cache));
+		}
+
+		function isDataValid(saved, goodFor) {
+			if (!saved || !saved.data || !saved.timestamp) return false;
+
+			let difference = new Date().getTime() - saved.timestamp;
+			return difference < goodFor;
+		}
+
+		function getData(status) {
+
+			let saved = localStorage.getItem(storageID);
+			if (!saved) return;
+			saved = JSON.parse(saved);
+
+			if (isDataValid(saved, 1000 * 5)) {
+				return saved.data;
+			} else if (status) {
+				showArticles(saved.data);
+			}
+		}
+
+		function fetchArticles() {
+			let saved = getData();
+			if (saved) {
+				showArticles(saved);
+				console.log('Loaded from cache');
+				return;
+			}
+
+			fetch(getEndpoint())
+				.then(getJSON)
+				.then(function (data) {
+					showArticles(data);
+					saveData(data);
+				})
+				.catch(renderCachedArticles);
+		}
+
+		fetchArticles();
+
+	</script>
+</body>
+
+</html>
