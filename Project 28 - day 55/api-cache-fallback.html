@@ -70,10 +70,23 @@
 			).join('');
 		}
 
-		function renderCachedArticles(error) {
-			const status = true;
-			getData(status);
-			console.log('Loaded from cache', error);
+		function renderFallback() {
+			let saved = localStorage.getItem(storageID);
+
+			if (!saved) {
+				renderNoArticles();
+				return
+			}
+
+			saved = JSON.parse(saved);
+			showArticles(saved.data);
+
+			console.log('Fallback from cache after failure');
+		}
+
+		function renderNoArticles(error) {
+			app.innerHTML = '<p>There is no pirate news! Come back later!</p>'
+			console.log(error)
 		}
 
 		function saveData(articles) {
@@ -101,8 +114,6 @@
 
 			if (isDataValid(saved, 1000 * 5)) {
 				return saved.data;
-			} else if (status) {
-				showArticles(saved.data);
 			}
 		}
 
@@ -120,7 +131,7 @@
 					showArticles(data);
 					saveData(data);
 				})
-				.catch(renderCachedArticles);
+				.catch(renderFallback);
 		}
 
 		fetchArticles();
