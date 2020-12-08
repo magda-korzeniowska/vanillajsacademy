@@ -11,6 +11,15 @@
 			text-align: center;
 			width: 88%;
 		}
+
+		#app {
+			font-size: 2em;
+		}
+
+		p {
+			margin-top: 0;
+			padding: 0;
+		}
 	</style>
 </head>
 
@@ -18,53 +27,71 @@
 
 	<h1>Timer</h1>
 
-	<div id="app"></div>
+	<div id="app" aria-live="polite"></div>
 
 	<script>
 		// Your code goes here...
 
+		let duration = 60;
+		let timer;
+
+		// State-based UI Component
 		const StateComponent = function (selector, options) {
 			this.elem = document.querySelector(selector);
 			this.data = options.data;
 			this.template = options.template;
 		}
 
+		// Render a new UI
 		StateComponent.prototype.render = function () {
 			this.elem.innerHTML = this.template(this.data);
 		}
 
-		let counter;
-
-		const countDownApp = new StateComponent('#app', {
+		// The StateComponent constructor object 
+		const app = new StateComponent('#app', {
 			data: {
-				seconds: counter
+				seconds: duration
 			},
 			template: function (props) {
 				return props.seconds < 1
-					? '<button data-timer>Restart counter</button>'
-					: `<span>${props.seconds}</span>`
+					? '⏰ <p><button data-timer>Restart counter</button></p>'
+					: props.seconds;
 			}
 		})
 
-		function startCountDown() {
-			countDownApp.data.seconds = 60;
-			let startInterval = setInterval(() => {
+		function startTimer() {
+			// Reset app data
+			app.data.seconds = duration;
 
-				countDownApp.data.seconds--;
+			// Render the initial UI
+			app.render();
 
-				if (countDownApp.data.seconds < 0) {
-					clearInterval(startInterval);
-				}
+			// Start the countdown timer
+			timer = setInterval(countdown, 1000);
+		}
 
-				countDownApp.render()
-			}, 1000);
+		function countdown() {
+			// Reduce the time by 1 second
+			app.data.seconds--;
+
+			// Check if the timer should be stopped
+			stopTimer();
+
+			// Update the UI
+			app.render();
+		}
+
+		function stopTimer() {
+			if (app.data.seconds > 0) return;
+			clearInterval(timer);
 		}
 
 		function clickHandler(event) {
-			if (event.target.hasAttribute('data-timer')) startCountDown();
+			if (!event.target.hasAttribute('data-timer')) return;
+			startTimer();
 		}
 
-		startCountDown();
+		startTimer();
 		document.addEventListener('click', clickHandler);
 
 	</script>
