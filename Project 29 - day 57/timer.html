@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Timer</title>
+
+	<style type="text/css">
+		body {
+			margin: 1em auto;
+			max-width: 40em;
+			text-align: center;
+			width: 88%;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>Timer</h1>
+
+	<div id="app"></div>
+
+	<script>
+		// Your code goes here...
+
+		const StateComponent = function (selector, options) {
+			this.elem = document.querySelector(selector);
+			this.data = options.data;
+			this.template = options.template;
+		}
+
+		StateComponent.prototype.render = function () {
+			this.elem.innerHTML = this.template(this.data);
+		}
+
+		let counter;
+
+		const countDownApp = new StateComponent('#app', {
+			data: {
+				seconds: counter
+			},
+			template: function (props) {
+				return props.seconds < 1
+					? '<button data-timer>Restart counter</button>'
+					: `<span>${props.seconds}</span>`
+			}
+		})
+
+		function startCountDown() {
+			countDownApp.data.seconds = 60;
+			let startInterval = setInterval(() => {
+
+				countDownApp.data.seconds--;
+
+				if (countDownApp.data.seconds < 0) {
+					clearInterval(startInterval);
+				}
+
+				countDownApp.render()
+			}, 1000);
+		}
+
+		function clickHandler(event) {
+			if (event.target.hasAttribute('data-timer')) startCountDown();
+		}
+
+		startCountDown();
+		document.addEventListener('click', clickHandler);
+
+	</script>
+</body>
+
+</html>
