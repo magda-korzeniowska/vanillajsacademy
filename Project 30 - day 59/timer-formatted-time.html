@@ -57,7 +57,7 @@
 				}
 			},
 			template: function (props) {
-				return props.time < 1
+				return props.time < 0
 					? '⏰ <p><button data-timer>Restart counter</button></p>'
 					: `<span>${props.formattedTime.minutes} : ${props.formattedTime.seconds}</span>`
 			}
@@ -98,7 +98,7 @@
 		}
 
 		function stopTimer() {
-			if (app.data.time > 0) return;
+			if (app.data.time >= 0) return;
 			clearInterval(timer);
 		}
 
