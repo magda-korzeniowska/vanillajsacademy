@@ -32,7 +32,7 @@
 	<script>
 		// Your code goes here...
 
-		let duration = 60;
+		let duration = 7;
 		let timer;
 
 		// State-based UI Component
@@ -50,12 +50,16 @@
 		// The StateComponent constructor object 
 		const app = new StateComponent('#app', {
 			data: {
-				time: duration
+				time: duration,
+				formattedTime: {
+					minutes: '0',
+					seconds: '00'
+				}
 			},
 			template: function (props) {
 				return props.time < 1
 					? '⏰ <p><button data-timer>Restart counter</button></p>'
-					: props.time;
+					: `<span>${props.formattedTime.minutes} : ${props.formattedTime.seconds}</span>`
 			}
 		})
 
@@ -64,13 +68,25 @@
 			app.data.time = duration;
 
 			// Render the initial UI
-			app.render();
+			// app.render();
 
 			// Start the countdown timer
 			timer = setInterval(countdown, 1000);
 		}
 
+		function formatTime() {
+			const minutes = Math.floor(app.data.time / 60);
+			const seconds = app.data.time % 60;
+
+			app.data.formattedTime = {
+				minutes: minutes.toString(),
+				seconds: seconds.toString().padStart(2, '0')
+			}
+		}
+
 		function countdown() {
+
+			formatTime();
 			// Reduce the time by 1 second
 			app.data.time--;
 

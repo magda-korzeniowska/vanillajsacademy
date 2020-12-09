@@ -29,3 +29,4 @@ Exercises from [Vanilla JS Academy 2020](https://vanillajsacademy.com) by Chris 
 * Project 27 - API Cache
 * Project 28 - API Cache - Fallback
 * Project 29 - Countdown Timer - state-based UI
+* Project 30 - Countdown Timer - formatted
