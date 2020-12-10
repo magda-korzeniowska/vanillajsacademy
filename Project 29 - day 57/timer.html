@@ -59,15 +59,9 @@
 			}
 		})
 
-		function startTimer() {
-			// Reset app data
-			app.data.time = duration;
-
-			// Render the initial UI
-			app.render();
-
-			// Start the countdown timer
-			timer = setInterval(countdown, 1000);
+		function stopTimer() {
+			if (app.data.time > 0) return;
+			clearInterval(timer);
 		}
 
 		function countdown() {
@@ -81,9 +75,15 @@
 			app.render();
 		}
 
-		function stopTimer() {
-			if (app.data.time > 0) return;
-			clearInterval(timer);
+		function startTimer() {
+			// Reset app data
+			app.data.time = duration;
+
+			// Render the initial UI
+			app.render();
+
+			// Start the countdown timer
+			timer = setInterval(countdown, 1000);
 		}
 
 		function clickHandler(event) {
