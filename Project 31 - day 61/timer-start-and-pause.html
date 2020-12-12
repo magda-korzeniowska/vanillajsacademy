@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Timer - Start & Pause</title>
+
+	<style type="text/css">
+		body {
+			margin: 1em auto;
+			max-width: 40em;
+			text-align: center;
+			width: 88%;
+		}
+
+		#app {
+			font-size: 2em;
+		}
+
+		p {
+			margin-top: 0;
+			padding: 0;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>Timer - Start & Pause</h1>
+
+	<div id="app" aria-live="polite"></div>
+
+	<script>
+		// Your code goes here...
+
+		let duration = 7;
+		let timer;
+
+		// State-based UI Component
+		const StateComponent = function (selector, options) {
+			this.elem = document.querySelector(selector);
+			this.data = options.data;
+			this.template = options.template;
+		}
+
+		// Render a new UI
+		StateComponent.prototype.render = function () {
+			this.elem.innerHTML = this.template(this.data);
+		}
+
+		function getTimerHTML(props) {
+			const minutes = Math.floor(props.time / 60);
+			const seconds = props.time % 60;
+
+			return `
+				${minutes.toString()} : ${seconds.toString().padStart(2, '0')}
+				<p>
+					${!props.running ? `<button data-start-timer>START</button>` : `<button data-pause-timer>PAUSE</button>`}
+					<button data-restart-timer>RESTART</button>
+				</p>
+			`;
+		}
+
+		// The StateComponent constructor object 
+		const app = new StateComponent('#app', {
+			data: {
+				time: duration,
+				running: false
+			},
+			template: function (props) {
+				return props.time < 1
+					? '⏰ <p><button data-restart-timer>RESTART</button></p>'
+					: getTimerHTML(props);
+			}
+		})
+
+		function stopTimer() {
+			clearInterval(timer);
+		}
+
+		function countdown() {
+
+			app.data.time--;
+			if (app.data.time < 1) {
+				stopTimer();
+			}
+
+			app.render();
+		}
+
+		function startTimer(event) {
+
+
+			if (!event.target.hasAttribute('data-start-timer')) return;
+
+			if (app.data.time < 1) {
+				restartTimer();
+				return;
+			}
+
+			app.data.running = true;
+			app.render();
+
+			// Stop any current running timers
+			stopTimer();
+
+			timer = setInterval(countdown, 1000);
+		}
+
+		function pauseTimer(event) {
+			if (!event.target.hasAttribute('data-pause-timer')) return
+
+			stopTimer();
+			app.data.running = false;
+			app.render();
+		}
+
+		function restartTimer(event) {
+
+			if (!event.target.hasAttribute('data-restart-timer')) return;
+
+			// Stop any current running timers
+			stopTimer();
+
+			app.data.time = duration;
+			app.data.running = true;
+
+			app.render();
+
+			timer = setInterval(countdown, 1000);
+		}
+
+		function clickHandler(event) {
+			startTimer(event);
+			pauseTimer(event);
+			restartTimer(event);
+		}
+
+		app.render();
+		document.addEventListener('click', clickHandler);
+
+	</script>
+</body>
+
+</html>
