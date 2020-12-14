@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>Timer - Start & Pause</title>
+	<title>Timer - Reactivity</title>
 
 	<style type="text/css">
 		body {
@@ -25,22 +25,60 @@
 
 <body>
 
-	<h1>Timer - Start & Pause</h1>
+	<h1>Timer - Reactivity</h1>
 
 	<div id="app" aria-live="polite"></div>
 
 	<script>
 		// Your code goes here...
 
-		let duration = 67;
+		let duration = 7;
 		let timer;
+
+		// Get the Proxy handler object
+		function handler(instance) {
+			return {
+				get: function (obj, prop) {
+					if (['[object Object]', '[object Array]'].indexOf(Object.prototype.toString.call(obj[prop])) > -1) {
+						return new Proxy(obj[prop], handler(instance));
+					}
+					return obj[prop];
+					instance.render();
+				},
+				set: function (obj, prop, value) {
+					obj[prop] = value;
+					instance.render();
+					return true;
+				},
+				deleteProperty: function (obj, prop) {
+					delete obj[prop];
+					instance.render();
+					return true;
+				}
+			};
+		};
 
 		// State-based UI Component
 		const StateComponent = function (selector, options) {
-			this.elem = document.querySelector(selector);
-			this.data = options.data;
-			this.template = options.template;
-		}
+
+			// Variables
+			const _this = this;
+			_this.elem = document.querySelector(selector);
+			const _data = new Proxy(options.data, handler(this));
+			_this.template = options.template;
+
+			// Define setter and getter for data
+			Object.defineProperty(this, 'data', {
+				get: function () {
+					return _data;
+				},
+				set: function (data) {
+					_data = new Proxy(data, handler(_this));
+					_this.render();
+					return true;
+				}
+			});
+		};
 
 		// Render a new UI
 		StateComponent.prototype.render = function () {
@@ -65,13 +103,11 @@
 		}
 
 		function countdown() {
-			app.data.time--;
 
+			app.data.time--;
 			if (app.data.time < 1) {
 				stopTimer();
 			}
-
-			app.render();
 		}
 
 		function startTimer(event) {
@@ -83,10 +119,10 @@
 			}
 
 			app.data.running = true;
-			app.render();
 
 			// Stop any current running timers
 			stopTimer();
+
 			timer = setInterval(countdown, 1000);
 		}
 
@@ -95,7 +131,6 @@
 
 			stopTimer();
 			app.data.running = false;
-			app.render();
 		}
 
 		function restartTimer(event) {
@@ -106,8 +141,6 @@
 
 			app.data.time = duration;
 			app.data.running = true;
-
-			app.render();
 
 			timer = setInterval(countdown, 1000);
 		}
