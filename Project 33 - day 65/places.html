@@ -24,6 +24,12 @@
 	<script>
 		// Your code goes here...
 
+		function sanitizeHTML(str) {
+			return str.replace(/[^\w. ]/gi, function (c) {
+				return '&#' + c.charCodeAt(0) + ';';
+			});
+		};
+
 		// Get the Proxy handler object
 		function handler(instance) {
 			return {
@@ -79,7 +85,7 @@
 			data: {},
 			template: function (props) {
 				return `<ul>${props.places.map(function (place) {
-					return `<li>${place.place}</li>`
+					return `<li>${sanitizeHTML(place.place)}</li>`
 				}).join('')}</ul>`
 			}
 		});
