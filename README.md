@@ -32,3 +32,4 @@ Exercises from [Vanilla JS Academy 2020](https://vanillajsacademy.com) by Chris 
 * Project 30 - Countdown Timer - formatted
 * Project 31 - Countdown Timer - stop & pause
 * Project 32 - Countdown Timer - reactive data (Proxies)
+* Project 33 - Places - Ajax & State

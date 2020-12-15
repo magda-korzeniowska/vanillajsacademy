@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Explore</title>
+
+	<style type="text/css">
+		body {
+			margin: 1em auto;
+			max-width: 60em;
+			width: 88%;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>Explore</h1>
+	<p>Explore cool, quirky places in your own backyard.</p>
+
+	<div id="app">Loading ... </div>
+
+	<script src="https://cdn.jsdelivr.net/npm/reefjs@7/dist/reef.js"></script>
+	<script>
+		// Your code goes here...
+
+		// Get the Proxy handler object
+		function handler(instance) {
+			return {
+				get: function (obj, prop) {
+					if (['[object Object]', '[object Array]'].indexOf(Object.prototype.toString.call(obj[prop])) > -1) {
+						return new Proxy(obj[prop], handler(instance));
+					}
+					return obj[prop];
+					instance.render();
+				},
+				set: function (obj, prop, value) {
+					obj[prop] = value;
+					instance.render();
+					return true;
+				},
+				deleteProperty: function (obj, prop) {
+					delete obj[prop];
+					instance.render();
+					return true;
+				}
+			};
+		};
+
+		// State-based UI Component
+		const StateComponent = function (selector, options) {
+
+			// Variables
+			const _this = this;
+			_this.elem = document.querySelector(selector);
+			const _data = new Proxy(options.data, handler(this));
+			_this.template = options.template;
+
+			// Define setter and getter for data
+			Object.defineProperty(this, 'data', {
+				get: function () {
+					return _data;
+				},
+				set: function (data) {
+					_data = new Proxy(data, handler(_this));
+					_this.render();
+					return true;
+				}
+			});
+		};
+
+		// Render a new UI
+		StateComponent.prototype.render = function () {
+			this.elem.innerHTML = this.template(this.data);
+		}
+
+		// Create the component
+		const app = new StateComponent('#app', {
+			data: {},
+			template: function (props) {
+				return `<ul>${props.places.map(function (place) {
+					return `<li>${place.place}</li>`
+				}).join('')}</ul>`
+			}
+		});
+
+		// Fetch data from the API
+		fetch('https://vanillajsacademy.com/api/places.json').then(function (response) {
+			return response.json();
+		}).then(function (data) {
+			// Reactively update the data
+			// This causes the render to happen
+			app.data.places = data;
+		});
+	</script>
+</body>
+
+</html>
