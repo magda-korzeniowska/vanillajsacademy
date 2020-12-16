@@ -10,6 +10,33 @@
 			max-width: 60em;
 			width: 88%;
 		}
+
+		@media (min-width: 40em) {
+			.place {
+				display: grid;
+				grid-template-columns: 1fr 2fr;
+				grid-template-rows: 1fr;
+				grid-column-gap: 2em;
+			}
+		}
+
+		.place {
+			margin-bottom: 2em;
+		}
+
+		.place h2 {
+			margin: 0 0 0.5em;
+			padding: 0;
+		}
+
+		p {
+			margin: 0 0 1em;
+		}
+
+		img {
+			height: auto;
+			max-width: 100%;
+		}
 	</style>
 </head>
 
@@ -24,80 +51,57 @@
 	<script>
 		// Your code goes here...
 
-		function sanitizeHTML(str) {
-			return str.replace(/[^\w. ]/gi, function (c) {
-				return '&#' + c.charCodeAt(0) + ';';
+		// Fetch data from the API
+		function getPlaces() {
+			fetch('https://vanillajsacademy.com/api/places.json').then(function (response) {
+				return response.ok ? response.json() : Promise.reject(response);
+			}).then(function (data) {
+				// Reactively update the data
+				// This causes the render to happen
+				app.data.places = data;
+			}).catch(function (err) {
+				console.warn(err);
+				app.data.places = null;
 			});
 		};
 
-		// Get the Proxy handler object
-		function handler(instance) {
-			return {
-				get: function (obj, prop) {
-					if (['[object Object]', '[object Array]'].indexOf(Object.prototype.toString.call(obj[prop])) > -1) {
-						return new Proxy(obj[prop], handler(instance));
-					}
-					return obj[prop];
-					instance.render();
-				},
-				set: function (obj, prop, value) {
-					obj[prop] = value;
-					instance.render();
-					return true;
-				},
-				deleteProperty: function (obj, prop) {
-					delete obj[prop];
-					instance.render();
-					return true;
-				}
-			};
-		};
-
-		// State-based UI Component
-		const StateComponent = function (selector, options) {
-
-			// Variables
-			const _this = this;
-			_this.elem = document.querySelector(selector);
-			const _data = new Proxy(options.data, handler(this));
-			_this.template = options.template;
-
-			// Define setter and getter for data
-			Object.defineProperty(this, 'data', {
-				get: function () {
-					return _data;
-				},
-				set: function (data) {
-					_data = new Proxy(data, handler(_this));
-					_this.render();
-					return true;
-				}
-			});
-		};
-
-		// Render a new UI
-		StateComponent.prototype.render = function () {
-			this.elem.innerHTML = this.template(this.data);
+		function getPlacesHTML(props) {
+			return props.places.map(function (place) {
+				let html =
+					`<div class="place">
+						<div>
+							<img src=${place.img}>
+						</div>
+						<div>
+							<h2>${place.place}</h2>
+							<p>${place.description}</p>
+							<p><em>${place.location}</em></p>
+							<a href="${place.url}">${place.url}</a>
+						</div>
+					</div>
+					`
+				return html
+			}).join('');
 		}
 
-		// Create the component
-		const app = new StateComponent('#app', {
+		function getNoPlacesHTML() {
+			return '<p>Sorry! Unable to find any places right now:( Please try again later</p>';
+		};
+
+		// App component
+		const app = new Reef('#app', {
 			data: {},
 			template: function (props) {
-				return `<ul>${props.places.map(function (place) {
-					return `<li>${sanitizeHTML(place.place)}</li>`
-				}).join('')}</ul>`
+
+				if (props.places && props.places.length) {
+					return getPlacesHTML(props);
+				}
+				return getNoPlacesHTML();
 			}
 		});
 
-		// Fetch data from the API
-		fetch('https://vanillajsacademy.com/api/places.json').then(function (response) {
-			return response.json();
-		}).then(function (data) {
-			// Reactively update the data
-			// This causes the render to happen
-			app.data.places = data;
-		});
+		getPlaces();
+
 	</script>
 </body>
 
