@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Explore - Faves</title>
+
+	<style type="text/css">
+		body {
+			margin: 1em auto;
+			max-width: 60em;
+			width: 88%;
+		}
+
+		@media (min-width: 40em) {
+			.place {
+				display: grid;
+				grid-template-columns: 1fr 2fr;
+				grid-template-rows: 1fr;
+				grid-column-gap: 2em;
+			}
+		}
+
+		.place {
+			margin-bottom: 2em;
+		}
+
+		.place h2 {
+			margin: 0 0 0.5em;
+			padding: 0;
+		}
+
+		p {
+			margin: 0 0 1em;
+		}
+
+		img {
+			height: auto;
+			max-width: 100%;
+		}
+
+		.fave {
+			border: none;
+			background-color: transparent;
+			font-size: 2em;
+			margin-top: 0.2em;
+		}
+
+		.fave[aria-pressed="true"] {
+			color: red;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>Explore - Faves</h1>
+	<p>Explore cool, quirky places in your own backyard.</p>
+
+	<div id="app">Loading ... </div>
+
+	<script src="https://cdn.jsdelivr.net/npm/reefjs@7/dist/reef.js"></script>
+	<script>
+		// Your code goes here...
+
+		let storageData = {
+			places: JSON.parse(localStorage.getItem('places-data')) || []
+		}
+
+		// Fetch data from the API
+		function getPlaces() {
+			if (storageData.places.length !== 0) {
+				app.data.places = storageData.places;
+			} else {
+				fetch('https://vanillajsacademy.com/api/places.json').then(function (response) {
+					return response.ok ? response.json() : Promise.reject(response);
+				}).then(function (data) {
+					// Reactively update the data
+					// This causes the render to happen
+					app.data.places = data;
+					app.data.places.forEach(place => place.fav = false)
+				}).catch(function (err) {
+					console.warn(err);
+					app.data.places = null;
+				});
+			}
+		};
+
+		function getPlacesHTML(props) {
+			return props.places.map(function (place) {
+				let html =
+					`<div class="place" data-id="${place.id}">
+						<div>
+							<img src=${place.img}>
+						</div>
+						<div>
+							<h2>${place.place}</h2>
+							<p>${place.description}</p>
+							<p><em>${place.location}</em></p>
+							<a href="${place.url}">${place.url}</a><br>
+							<button class="fave" aria-label="Favorite" aria-pressed="${place.fav}">♥︎</button>
+						</div>
+					</div>
+					`
+				return html
+			}).join('');
+		}
+
+		function getNoPlacesHTML() {
+			return '<p>Sorry! Unable to find any places right now:( Please try again later</p>';
+		};
+
+		function saveFavePlaces() {
+			localStorage.setItem('places-data', JSON.stringify(app.data.places));
+		}
+
+		function markUnmarkAsFave(placeId, heartClicked) {
+			const clickedPlace = app.data.places.filter(place => place.id === placeId)[0];
+
+			clickedPlace.fav = clickedPlace.fav === 'false' ? 'true' : 'false';
+
+			saveFavePlaces();
+		}
+
+		function handleClick(event) {
+			if (!event.target.hasAttribute('aria-pressed')) return
+
+			markUnmarkAsFave(
+				event.target.parentElement.parentElement.getAttribute('data-id'),
+				event.target
+			)
+		}
+
+		// App component
+		const app = new Reef('#app', {
+			data: {},
+			template: function (props) {
+				console.log(props.places)
+
+				if (props.places && props.places.length) {
+					return getPlacesHTML(props);
+				}
+				return getNoPlacesHTML();
+			}
+		});
+
+		document.addEventListener('click', handleClick);
+		getPlaces();
+
+	</script>
+</body>
+
+</html>
