@@ -62,33 +62,38 @@
 	<script>
 		// Your code goes here...
 
-		let storageData = {
-			places: JSON.parse(localStorage.getItem('places-data')) || []
+		let storageID = 'favesID';
+
+		// Get favorite places from localStorage
+		function getFavePlaces() {
+			let faves = localStorage.getItem(storageID);
+			let favesObj = faves ? JSON.parse(faves) : {};
+			return favesObj;
+		}
+		// Save favorite places to localStorage
+		function saveFavePlaces(faves) {
+			localStorage.setItem(storageID, JSON.stringify(faves));
 		}
 
-		// Fetch data from the API
+		// Get place data from the API and update the app state
 		function getPlaces() {
-			if (storageData.places.length !== 0) {
-				app.data.places = storageData.places;
-			} else {
-				fetch('https://vanillajsacademy.com/api/places.json').then(function (response) {
-					return response.ok ? response.json() : Promise.reject(response);
-				}).then(function (data) {
-					// Reactively update the data
-					// This causes the render to happen
-					app.data.places = data;
-					app.data.places.forEach(place => place.fav = false)
-				}).catch(function (err) {
-					console.warn(err);
-					app.data.places = null;
-				});
-			}
+			fetch('https://vanillajsacademy.com/api/places.json').then(function (response) {
+				return response.ok ? response.json() : Promise.reject(response);
+			}).then(function (data) {
+				// Reactively update the data
+				// This causes the render to happen
+				app.data.faves = getFavePlaces();
+				app.data.places = data;
+			}).catch(function (err) {
+				console.warn(err);
+				app.data.places = null;
+			});
 		};
 
 		function getPlacesHTML(props) {
 			return props.places.map(function (place) {
 				let html =
-					`<div class="place" data-id="${place.id}">
+					`<div class="place">
 						<div>
 							<img src=${place.img}>
 						</div>
@@ -97,7 +102,7 @@
 							<p>${place.description}</p>
 							<p><em>${place.location}</em></p>
 							<a href="${place.url}">${place.url}</a><br>
-							<button class="fave" aria-label="Favorite" aria-pressed="${place.fav}">♥︎</button>
+							<button class="fave" data-fave="${place.id}" aria-label="Save ${place.place}" aria-pressed="${props.faves[place.id]}">♥︎</button>
 						</div>
 					</div>
 					`
@@ -109,32 +114,10 @@
 			return '<p>Sorry! Unable to find any places right now:( Please try again later</p>';
 		};
 
-		function saveFavePlaces() {
-			localStorage.setItem('places-data', JSON.stringify(app.data.places));
-		}
-
-		function markUnmarkAsFave(placeId, heartClicked) {
-			const clickedPlace = app.data.places.filter(place => place.id === placeId)[0];
-
-			clickedPlace.fav = clickedPlace.fav === 'false' ? 'true' : 'false';
-
-			saveFavePlaces();
-		}
-
-		function handleClick(event) {
-			if (!event.target.hasAttribute('aria-pressed')) return
-
-			markUnmarkAsFave(
-				event.target.parentElement.parentElement.getAttribute('data-id'),
-				event.target
-			)
-		}
-
 		// App component
 		const app = new Reef('#app', {
 			data: {},
 			template: function (props) {
-				console.log(props.places)
 
 				if (props.places && props.places.length) {
 					return getPlacesHTML(props);
@@ -143,9 +126,17 @@
 			}
 		});
 
-		document.addEventListener('click', handleClick);
-		getPlaces();
+		function clickHandler(event) {
+			let place = event.target.getAttribute('data-fave');
+			if (!place) return;
 
+			app.data.faves[place] = app.data.faves[place] ? false : true;
+
+			saveFavePlaces(app.data.faves);
+		}
+
+		document.addEventListener('click', clickHandler);
+		getPlaces();
 	</script>
 </body>
 
